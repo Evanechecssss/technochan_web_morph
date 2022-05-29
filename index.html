@@ -22,9 +22,9 @@
 <canvas id = "bodyCanvas"></canvas>
 <div id = "sliders" style="margin-left: 20px;">
     <p>Сдвиг X</p>
-    <input type="range" id = "x_shift" max="1" min="-1" step="0.01" onchange="headXShift('x_shift')">
+    <input type="range" id = "x_shift" max="1" min="-1" step="0.01" onchange="headShift('x_shift')">
     <p>Сдвиг Y</p>
-    <input type="range" id = "y_shift" max="1" min="-1" step="0.01" onchange="headXShift('y_shift')">
+    <input type="range" id = "y_shift" max="1" min="-1" step="0.01" onchange="headShift('y_shift')">
 
     <p>Длина головы</p>
     <input type="range" id = "head_height" max="1" min="0" step="0.01" value="0.62" onchange="headChange('head_height')">
@@ -39,7 +39,6 @@
 <script>
     const canvas = document.getElementById("bodyCanvas")
     const symetric_toogle = {btn: document.getElementById("btn"),txt: document.getElementById("symetric")}
-    
     canvas.width = 600;
     canvas.height = 600;
 
@@ -47,13 +46,21 @@
     var center_point_y = 0; 
     var click_point_x = 0;
     var click_point_y = 0;
-
     var head_height = 0.62;
     var head_width = 0.47;
-
     var click_zone = "undef";
+    var do_q_sym = false;
+    var ul_q_x = 0;
+    var ul_q_y = 0;
+    var ur_q_x = 0;
+    var ur_q_y = 0;
+    var dl_q_x = 0;
+    var dl_q_y = 0;
+    var dr_q_x = 0;
+    var dr_q_y = 0;
+    var lineWidth = 0.01;
+    var skinTone = "#FDE6E6"
 
-    
     const ctx = canvas.getContext("2d");
     ctx.translate(canvas.width/2, canvas.height/2)
     ctx.scale(canvas.width*0.5,canvas.height*0.5)
@@ -64,6 +71,7 @@
     {   
         animate()
     }
+    
     symetric_toogle['btn'].onclick = function()
     {
         do_q_sym = !do_q_sym
@@ -81,6 +89,12 @@
     canvas.addEventListener("click",clickEvent);
 
     function clickEvent(event)
+    {
+        zone_locate(event)
+        setFace(event)
+    }
+
+    function zone_locate(event)
     {
         let clickCords = getCords(event)
         click_point_x = clickCords['x']
@@ -117,6 +131,59 @@
             }
         }
     }
+    
+    function setFace()
+    {
+
+        if(click_zone=="ul")
+        {
+            ul_q_x = click_point_x
+            ul_q_y = click_point_y
+
+            if (do_q_sym)
+            {
+                ur_q_x = (center_point_x*2) - click_point_x
+                ur_q_y = click_point_y
+            }
+
+
+
+            click_zone = "undef";
+        }
+        if(click_zone=="ur")
+        {
+            ur_q_x = click_point_x
+            ur_q_y = click_point_y
+            if (do_q_sym)
+            {
+                ul_q_x = (center_point_x*2) - click_point_x
+                ul_q_y = click_point_y
+            }
+            click_zone = "undef";
+        }
+        if(click_zone=="dl")
+        {
+            dl_q_x = click_point_x
+            dl_q_y = click_point_y
+            if (do_q_sym)
+            {
+                dr_q_x = (center_point_x*2) - click_point_x
+                dr_q_y = click_point_y
+            }
+            click_zone = "undef";
+        }
+        if(click_zone=="dr")
+        {
+            dr_q_x = click_point_x
+            dr_q_y = click_point_y
+            if (do_q_sym)
+            {
+                dl_q_x = (center_point_x*2) - click_point_x
+                dl_q_y = click_point_y
+            }
+            click_zone = "undef";
+        }
+    }
 
     function getCords(event)
     {
@@ -135,122 +202,77 @@
         drawAvatar();
         requestAnimationFrame(animate)
     }
-    var do_q_sym = false;
-    var ul_q_x = 0;
-    var ul_q_y = 0;
-    var ur_q_x = 0;
-    var ur_q_y = 0;
-    var dl_q_x = 0;
-    var dl_q_y = 0;
-    var dr_q_x = 0;
-    var dr_q_y = 0;
-    var lineWidth = 0.01;
+    
+
 
     function drawAvatar()
     {
-        let up_head_point_x = Number(center_point_x);
-        let up_head_point_y =  Number(center_point_y);
         ctx.lineWidth = lineWidth;
+        //#region drawCross
         ctx.beginPath();
-        ctx.moveTo(up_head_point_x,up_head_point_y);
-        ctx.lineTo(up_head_point_x,up_head_point_y-head_height);
+        ctx.moveTo(center_point_x,center_point_y);
+        ctx.lineTo(center_point_x,center_point_y-head_height);
         ctx.stroke();
 
         ctx.beginPath();
-        ctx.moveTo(up_head_point_x,up_head_point_y);
-        ctx.lineTo(up_head_point_x,up_head_point_y+head_height);
+        ctx.moveTo(center_point_x,center_point_y);
+        ctx.lineTo(center_point_x,center_point_y+head_height);
         ctx.stroke();
 
         ctx.beginPath();
-        ctx.moveTo(up_head_point_x,center_point_y);
-        ctx.lineTo(up_head_point_x-head_width,center_point_y);
+        ctx.moveTo(center_point_x,center_point_y);
+        ctx.lineTo(center_point_x-head_width,center_point_y);
         ctx.stroke();
 
         ctx.beginPath();
-        ctx.moveTo(up_head_point_x,center_point_y);
-        ctx.lineTo(up_head_point_x+head_width,center_point_y);
+        ctx.moveTo(center_point_x,center_point_y);
+        ctx.lineTo(center_point_x+head_width,center_point_y);
         ctx.stroke();
 
-        drawPoint({x:up_head_point_x,y:up_head_point_y},"центр",0.025,0.005,"lime")
-        drawPoint({x:up_head_point_x+head_width,y:up_head_point_y},"право",0.025,0.005,"lime")
-        drawPoint({x:up_head_point_x-head_width,y:up_head_point_y},"лево",0.025,0.005,"lime")
-        drawPoint({x:up_head_point_x,y:up_head_point_y-head_height},"верх",0.025,0.005,"lime")
-        drawPoint({x:up_head_point_x,y:up_head_point_y+head_height},"низ",0.025,0.005,"lime")
 
-
-        if(click_zone=="ul")
-        {
-            ul_q_x = click_point_x
-            ul_q_y = click_point_y
-            if (do_q_sym)
-            {
-                ur_q_x = -click_point_x
-                ur_q_y = click_point_y
-            }
-            click_zone = "undef";
-        }
-        if(click_zone=="ur")
-        {
-            ur_q_x = click_point_x
-            ur_q_y = click_point_y
-            if (do_q_sym)
-            {
-                ul_q_x = -click_point_x
-                ul_q_y = click_point_y
-            }
-            click_zone = "undef";
-        }
-        if(click_zone=="dl")
-        {
-            dl_q_x = click_point_x
-            dl_q_y = click_point_y
-            if (do_q_sym)
-            {
-                dr_q_x = -click_point_x
-                dr_q_y = click_point_y
-            }
-            click_zone = "undef";
-        }
-        if(click_zone=="dr")
-        {
-            dr_q_x = click_point_x
-            dr_q_y = click_point_y
-            if (do_q_sym)
-            {
-                dl_q_x = -click_point_x
-                dl_q_y = click_point_y
-            }
-            click_zone = "undef";
-        }
-
+        //#endregion
+        //#region drawControlPoints
+        drawPoint({x:center_point_x,y:center_point_y},"центр",0.025,0.005,"lime")
+        drawPoint({x:center_point_x+head_width,y:center_point_y},"право",0.025,0.005,"lime")
+        drawPoint({x:center_point_x-head_width,y:center_point_y},"лево",0.025,0.005,"lime")
+        drawPoint({x:center_point_x,y:center_point_y-head_height},"верх",0.025,0.005,"lime")
+        drawPoint({x:center_point_x,y:center_point_y+head_height},"низ",0.025,0.005,"lime")
         drawPoint({x:ur_q_x,y:ur_q_y},"вп",0.02,0.005)
         drawPoint({x:ul_q_x,y:ul_q_y},"вл",0.02,0.005)
         drawPoint({x:dr_q_x,y:dr_q_y},"нп",0.02,0.005)
         drawPoint({x:dl_q_x,y:dl_q_y},"нл",0.02,0.005)
-
+        //#endregion
+        //#region drawFace
         ctx.beginPath();
-        ctx.moveTo(up_head_point_x,up_head_point_y-head_height);
-        ctx.quadraticCurveTo(ul_q_x,ul_q_y,up_head_point_x-head_width,up_head_point_y);
+        ctx.moveTo(center_point_x,center_point_y-head_height);
+        ctx.quadraticCurveTo(ul_q_x,ul_q_y,center_point_x-head_width,center_point_y);
         ctx.stroke();
-
         ctx.beginPath();
-        ctx.moveTo(up_head_point_x,up_head_point_y-head_height);
-        ctx.quadraticCurveTo(ur_q_x,ur_q_y,up_head_point_x+head_width,up_head_point_y);
+        ctx.moveTo(center_point_x,center_point_y-head_height);
+        ctx.quadraticCurveTo(ur_q_x,ur_q_y,center_point_x+head_width,center_point_y);
         ctx.stroke();
-
-
         ctx.beginPath();
-        ctx.moveTo(up_head_point_x,up_head_point_y+head_height);
-        ctx.quadraticCurveTo(dr_q_x,dr_q_y,up_head_point_x+head_width,up_head_point_y);
+        ctx.moveTo(center_point_x,center_point_y+head_height);
+        ctx.quadraticCurveTo(dr_q_x,dr_q_y,center_point_x+head_width,center_point_y);
         ctx.stroke();
-
         ctx.beginPath();
-        ctx.moveTo(up_head_point_x,up_head_point_y+head_height);
-        ctx.quadraticCurveTo(dl_q_x,dl_q_y,up_head_point_x-head_width,up_head_point_y);
+        ctx.moveTo(center_point_x,center_point_y+head_height);
+        ctx.quadraticCurveTo(dl_q_x,dl_q_y,center_point_x-head_width,center_point_y);
         ctx.stroke();
+        ctx.fillStyle = skinTone
+        ctx.fill()
+        //#endregion
         
+        ctx.beginPath();
+        ctx.moveTo(center_point_x-0.1,center_point_y+head_height);
+        ctx.quadraticCurveTo(0,0,center_point_x-0.1,center_point_y+head_height+0.2);
+        ctx.stroke();
 
-
+        
+        ctx.beginPath();
+        ctx.moveTo(center_point_x+0.1,center_point_y+head_height);
+        ctx.quadraticCurveTo(1,0,center_point_x+0.1,center_point_y+head_height+0.2);
+        ctx.stroke();
 
         window.requestAnimationFrame(drawAvatar);
     }
@@ -271,7 +293,7 @@
         ctx.lineWidth = lineWidth;
     }
 
-    function headXShift(id)
+    function headShift(id)
     {
        togle = document.getElementById(id)
        if (id == 'x_shift')
@@ -306,6 +328,7 @@
             head_height = Number(togle.value)
         }
     }
+
 </script>
 </body>
 </html>
