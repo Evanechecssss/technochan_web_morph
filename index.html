@@ -3,11 +3,11 @@
 <head>
     <meta charset="utf-8">
     <title>Технотян</title>
-    <meta property="og:title" content="Технотян" />
+    <meta property="og:title" content="Technochan" />
     <meta property="og:type" content="article" />
     <meta property="og:url" content="https://evanechecssss.github.io/technochan_web_morph" />
     <meta property="og:image" content="" />
-    <meta property="og:site_name" content="Технотян" />
+    <meta property="og:site_name" content="Technochan" />
     <link rel="icon" href="./assets/imgs/icon.png" type="image/png">
     <link rel="stylesheet" href="./assets/styles/main.css">
     <link rel="stylesheet" href="./assets/styles/canvas.css">
@@ -21,17 +21,17 @@
 <body>
 <canvas id = "bodyCanvas"></canvas>
 <div id = "sliders" style="margin-left: 20px;">
-    <p>Сдвиг X</p>
+    <p>Shift X</p>
     <input type="range" id = "x_shift" max="1" min="-1" step="0.01" onchange="headShift('x_shift')">
-    <p>Сдвиг Y</p>
+    <p>Shift Y</p>
     <input type="range" id = "y_shift" max="1" min="-1" step="0.01" onchange="headShift('y_shift')">
 
-    <p>Длина головы</p>
+    <p>Head height</p>
     <input type="range" id = "head_height" max="1" min="0" step="0.01" value="0.62" onchange="headChange('head_height')">
-    <p>Ширина головы</p>
+    <p>Head width</p>
     <input type="range" id = "head_width" max="1" min="0" step="0.01" value="0.47" onchange="headChange('head_width')">
     <div id="btn">
-        <p id="symetric" style="color: white;">Симетрично</p>
+        <p id="symetric" style="color: white;">Symmetry</p>
 
     </div>
 
@@ -42,24 +42,23 @@
     canvas.width = 600;
     canvas.height = 600;
 
-    var center_point_x = 0;
-    var center_point_y = 0; 
+    var center_point_x = -0.04;
+    var center_point_y = -0.11; 
     var click_point_x = 0;
     var click_point_y = 0;
     var head_height = 0.62;
     var head_width = 0.47;
     var click_zone = "undef";
     var do_q_sym = false;
-    var ul_q_x = 0;
-    var ul_q_y = 0;
-    var ur_q_x = 0;
-    var ur_q_y = 0;
-    var dl_q_x = 0;
-    var dl_q_y = 0;
-    var dr_q_x = 0;
-    var dr_q_y = 0;
+    var ul_q_x = -0.43;
+    var ul_q_y = -0.66;
+    var ur_q_x = 0.35;
+    var ur_q_y = -0.66;
+    var dl_q_x = -0.51;
+    var dl_q_y = 0.35;
+    var dr_q_x = 0.43;
+    var dr_q_y = 0.35;
     var lineWidth = 0.01;
-
 
     const ctx = canvas.getContext("2d");
     ctx.translate(canvas.width/2, canvas.height/2)
@@ -227,15 +226,15 @@
         ctx.stroke();
         //#endregion
         //#region drawControlPoints
-        drawPoint({x:center_point_x,y:center_point_y},"центр",0.025,0.005,"lime")
-        drawPoint({x:center_point_x+head_width,y:center_point_y},"право",0.025,0.005,"lime")
-        drawPoint({x:center_point_x-head_width,y:center_point_y},"лево",0.025,0.005,"lime")
-        drawPoint({x:center_point_x,y:center_point_y-head_height},"верх",0.025,0.005,"lime")
-        drawPoint({x:center_point_x,y:center_point_y+head_height},"низ",0.025,0.005,"lime")
-        drawPoint({x:ur_q_x,y:ur_q_y},"вп",0.02,0.005)
-        drawPoint({x:ul_q_x,y:ul_q_y},"вл",0.02,0.005)
-        drawPoint({x:dr_q_x,y:dr_q_y},"нп",0.02,0.005)
-        drawPoint({x:dl_q_x,y:dl_q_y},"нл",0.02,0.005)
+        drawPoint({x:center_point_x,y:center_point_y},"center",0.025,0.005,"lime")
+        drawPoint({x:center_point_x+head_width,y:center_point_y},"Right",0.025,0.005,"lime")
+        drawPoint({x:center_point_x-head_width,y:center_point_y},"Left",0.025,0.005,"lime")
+        drawPoint({x:center_point_x,y:center_point_y-head_height},"Up",0.025,0.005,"lime")
+        drawPoint({x:center_point_x,y:center_point_y+head_height},"Down",0.025,0.005,"lime")
+        drawPoint({x:ur_q_x,y:ur_q_y}," ",0.02,0.005)
+        drawPoint({x:ul_q_x,y:ul_q_y}," ",0.02,0.005)
+        drawPoint({x:dr_q_x,y:dr_q_y}," ",0.02,0.005)
+        drawPoint({x:dl_q_x,y:dl_q_y}," ",0.02,0.005)
         //#endregion
         //#region drawFace
         ctx.beginPath();
