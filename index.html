@@ -59,7 +59,7 @@
     var dr_q_x = 0;
     var dr_q_y = 0;
     var lineWidth = 0.01;
-    var skinTone = "#FDE6E6"
+
 
     const ctx = canvas.getContext("2d");
     ctx.translate(canvas.width/2, canvas.height/2)
@@ -213,23 +213,18 @@
         ctx.moveTo(center_point_x,center_point_y);
         ctx.lineTo(center_point_x,center_point_y-head_height);
         ctx.stroke();
-
         ctx.beginPath();
         ctx.moveTo(center_point_x,center_point_y);
         ctx.lineTo(center_point_x,center_point_y+head_height);
         ctx.stroke();
-
         ctx.beginPath();
         ctx.moveTo(center_point_x,center_point_y);
         ctx.lineTo(center_point_x-head_width,center_point_y);
         ctx.stroke();
-
         ctx.beginPath();
         ctx.moveTo(center_point_x,center_point_y);
         ctx.lineTo(center_point_x+head_width,center_point_y);
         ctx.stroke();
-
-
         //#endregion
         //#region drawControlPoints
         drawPoint({x:center_point_x,y:center_point_y},"центр",0.025,0.005,"lime")
@@ -259,19 +254,8 @@
         ctx.moveTo(center_point_x,center_point_y+head_height);
         ctx.quadraticCurveTo(dl_q_x,dl_q_y,center_point_x-head_width,center_point_y);
         ctx.stroke();
-  
         //#endregion
-        
-        ctx.beginPath();
-        ctx.moveTo(center_point_x-0.1,center_point_y+head_height);
-        ctx.quadraticCurveTo(0,0,center_point_x-0.1,center_point_y+head_height+0.2);
-        ctx.stroke();
 
-        
-        ctx.beginPath();
-        ctx.moveTo(center_point_x+0.1,center_point_y+head_height);
-        ctx.quadraticCurveTo(1,0,center_point_x+0.1,center_point_y+head_height+0.2);
-        ctx.stroke();
 
         window.requestAnimationFrame(drawAvatar);
     }
