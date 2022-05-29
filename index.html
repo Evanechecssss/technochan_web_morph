@@ -10,20 +10,302 @@
     <meta property="og:site_name" content="Технотян" />
     <link rel="icon" href="./assets/imgs/icon.png" type="image/png">
     <link rel="stylesheet" href="./assets/styles/main.css">
+    <link rel="stylesheet" href="./assets/styles/canvas.css">
     <link rel="stylesheet" href="./assets/styles/adaptivesite.css">
-
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;500;600;700&family=Lexend:wght@100;200;300;400;500;600;700;800;900&family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap" rel="stylesheet">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
 </head>
 <body>
-<div class="header">
-    <h1 class="text_center">header</h1>
+<canvas id = "bodyCanvas"></canvas>
+<div id = "sliders" style="margin-left: 20px;">
+    <p style="text-align: center; margin: 0; color: white;">Сдвиг X</p>
+    <input type="range" id = "x_shift" max="1" min="-1" step="0.01" onchange="headXShift('x_shift')">
+    <p style="text-align: center; margin: 0; color: white;">Сдвиг Y</p>
+    <input type="range" id = "y_shift" max="1" min="-1" step="0.01" onchange="headXShift('y_shift')">
+
+    <p style="text-align: center; margin: 0; color: white;">Длина головы</p>
+    <input type="range" id = "head_height" max="1" min="0" step="0.01" value="0.62" onchange="headChange('head_height')">
+    <p style="text-align: center; margin: 0; color: white;">Ширина головы</p>
+    <input type="range" id = "head_width" max="1" min="0" step="0.01" value="0.47" onchange="headChange('head_width')">
 </div>
-<div class="body">
-    <h1 class="text_center">body</h1>
-</div>
-<div class="footer">
-    <h1 class="text_center">footer</h1>
-</div>
+<p id="symetric" style="color: white;">Симетрично</p>
+<script>
+    const canvas = document.getElementById("bodyCanvas")
+    const symetric_toogle = document.getElementById("symetric")
+    
+    canvas.width = 600;
+    canvas.height = 600;
+
+   /*var center_point_x = -0.08;
+     var center_point_y = -0.12;  */
+
+    var center_point_x = 0;
+    var center_point_y = 0; 
+    var click_point_x = 0;
+    var click_point_y = 0;
+
+    var head_height = 0.62;
+    var head_width = 0.47;
+
+    var click_zone = "undef";
+
+    
+    const ctx = canvas.getContext("2d");
+    ctx.translate(canvas.width/2, canvas.height/2)
+    ctx.scale(canvas.width*0.5,canvas.height*0.5)
+    const img = new Image();
+    img.src = 'assets/imgs/reference.jpg';
+
+    img.onload = function()
+    {   
+        animate()
+    }
+    symetric_toogle.onclick = function()
+    {
+        do_q_sym = !do_q_sym
+        if (do_q_sym)
+        {
+            symetric_toogle.style.color = 'red';
+        }
+        else{
+            symetric_toogle.style.color = 'white';
+
+        }
+    }
+
+    canvas.addEventListener("click",clickEvent);
+
+    function clickEvent(event)
+    {
+        let clickCords = getCords(event)
+        click_point_x = clickCords['x']
+        click_point_y = clickCords['y']
+
+        distR = Math.sqrt( (click_point_x - center_point_x+head_width)**2 + (click_point_y - center_point_y)**2 )
+        distL = Math.sqrt( (click_point_x - center_point_x-head_width)**2 + (click_point_y - center_point_y)**2 )
+
+        distU = Math.sqrt( (click_point_x - center_point_x)**2 + (click_point_y - center_point_y + head_height)**2 )
+        distD = Math.sqrt( (click_point_x - center_point_x)**2 + (click_point_y - center_point_y - head_height)**2 )
+
+        if (distR < distL)
+        {
+            if (distU < distD)
+            {
+                click_zone = "ul"
+
+            }else
+            {
+                click_zone = "dl"
+            }
+        }
+        else
+        {
+            if (distU < distD)
+            {
+                click_zone = "ur"
+
+            }
+            else
+            {
+                click_zone = "dr"
+
+            }
+        }
+    }
+
+    function getCords(event)
+    {
+        const x = (event.x-canvas.width/2)/(canvas.width/2)
+        const y = (event.y-canvas.height/2)/(canvas.height/2)
+        return {x:x.toFixed(2),y:y.toFixed(2)}
+
+    }
+
+    function animate()
+    {
+        ctx.clearRect(-1,-1,2,2)
+        //ctx.globalAlpha = 0.2;
+        ctx.drawImage(img,-1,-1,2,2);
+        ctx.globalAlpha = 1;
+        drawAvatar();
+        requestAnimationFrame(animate)
+    }
+    var do_q_sym = false;
+    var ul_q_x = 0;
+    var ul_q_y = 0;
+    var ur_q_x = 0;
+    var ur_q_y = 0;
+    var dl_q_x = 0;
+    var dl_q_y = 0;
+    var dr_q_x = 0;
+    var dr_q_y = 0;
+    var lineWidth = 0.01;
+
+    function drawAvatar()
+    {
+        let up_head_point_x = Number(center_point_x);
+        let up_head_point_y =  Number(center_point_y);
+        ctx.lineWidth = lineWidth;
+        ctx.beginPath();
+        ctx.moveTo(up_head_point_x,up_head_point_y);
+        ctx.lineTo(up_head_point_x,up_head_point_y-head_height);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(up_head_point_x,up_head_point_y);
+        ctx.lineTo(up_head_point_x,up_head_point_y+head_height);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(up_head_point_x,center_point_y);
+        ctx.lineTo(up_head_point_x-head_width,center_point_y);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(up_head_point_x,center_point_y);
+        ctx.lineTo(up_head_point_x+head_width,center_point_y);
+        ctx.stroke();
+
+        drawPoint({x:up_head_point_x,y:up_head_point_y},"центр",0.025,0.005,"lime")
+        drawPoint({x:up_head_point_x+head_width,y:up_head_point_y},"право",0.025,0.005,"lime")
+        drawPoint({x:up_head_point_x-head_width,y:up_head_point_y},"лево",0.025,0.005,"lime")
+        drawPoint({x:up_head_point_x,y:up_head_point_y-head_height},"верх",0.025,0.005,"lime")
+        drawPoint({x:up_head_point_x,y:up_head_point_y+head_height},"низ",0.025,0.005,"lime")
+
+
+        if(click_zone=="ul")
+        {
+            ul_q_x = click_point_x
+            ul_q_y = click_point_y
+            if (do_q_sym)
+            {
+                ur_q_x = -click_point_x
+                ur_q_y = click_point_y
+            }
+            click_zone = "undef";
+        }
+        if(click_zone=="ur")
+        {
+            ur_q_x = click_point_x
+            ur_q_y = click_point_y
+            if (do_q_sym)
+            {
+                ul_q_x = -click_point_x
+                ul_q_y = click_point_y
+            }
+            click_zone = "undef";
+        }
+        if(click_zone=="dl")
+        {
+            dl_q_x = click_point_x
+            dl_q_y = click_point_y
+            if (do_q_sym)
+            {
+                dr_q_x = -click_point_x
+                dr_q_y = click_point_y
+            }
+            click_zone = "undef";
+        }
+        if(click_zone=="dr")
+        {
+            dr_q_x = click_point_x
+            dr_q_y = click_point_y
+            if (do_q_sym)
+            {
+                dl_q_x = -click_point_x
+                dl_q_y = click_point_y
+            }
+            click_zone = "undef";
+        }
+
+        drawPoint({x:ur_q_x,y:ur_q_y},"вп",0.02,0.005)
+        drawPoint({x:ul_q_x,y:ul_q_y},"вл",0.02,0.005)
+        drawPoint({x:dr_q_x,y:dr_q_y},"нп",0.02,0.005)
+        drawPoint({x:dl_q_x,y:dl_q_y},"нл",0.02,0.005)
+
+        ctx.beginPath();
+        ctx.moveTo(up_head_point_x,up_head_point_y-head_height);
+        ctx.quadraticCurveTo(ul_q_x,ul_q_y,up_head_point_x-head_width,up_head_point_y);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(up_head_point_x,up_head_point_y-head_height);
+        ctx.quadraticCurveTo(ur_q_x,ur_q_y,up_head_point_x+head_width,up_head_point_y);
+        ctx.stroke();
+
+
+        ctx.beginPath();
+        ctx.moveTo(up_head_point_x,up_head_point_y+head_height);
+        ctx.quadraticCurveTo(dr_q_x,dr_q_y,up_head_point_x+head_width,up_head_point_y);
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.moveTo(up_head_point_x,up_head_point_y+head_height);
+        ctx.quadraticCurveTo(dl_q_x,dl_q_y,up_head_point_x-head_width,up_head_point_y);
+        ctx.stroke();
+        
+
+
+
+        window.requestAnimationFrame(drawAvatar);
+    }
+
+    function drawPoint(loc, label, rad = 0.07, line =  0.01, color = 'pink')
+    {
+        ctx.lineWidth = line;
+
+        ctx.beginPath()
+        ctx.arc(loc.x,loc.y,rad,0,Math.PI*2)
+        ctx.stroke();
+        ctx.fillStyle = color
+        ctx.fill()
+        ctx.fillStyle = 'black'
+        ctx.font = (rad*2) + "px Arial"
+        ctx.textAlign = "center"
+        ctx.textBaseline = "middle"
+        ctx.fillText(label,loc.x,loc.y)
+
+        ctx.lineWidth = lineWidth;
+    }
+
+    function headXShift(id)
+    {
+       togle = document.getElementById(id)
+       if (id == 'x_shift')
+       {
+        deltha = center_point_x - Number(togle.value)
+        center_point_x = Number(togle.value)
+        ul_q_x = ul_q_x - deltha
+        ur_q_x = ur_q_x - deltha
+        dl_q_x = dl_q_x - deltha
+        dr_q_x = dr_q_x - deltha
+       }
+       else
+       {
+        deltha = center_point_y - Number(togle.value)
+        center_point_y = Number(togle.value)
+        ul_q_y = ul_q_y - deltha
+        ur_q_y = ur_q_y - deltha
+        dl_q_y = dl_q_y - deltha
+        dr_q_y = dr_q_y - deltha
+       }
+    }
+
+    function headChange(id)
+    {
+        togle = document.getElementById(id)
+        if (id == 'head_width')
+        {
+            head_width =  Number(togle.value)
+        }
+        else
+        {
+            head_height = Number(togle.value)
+        }
+    }
+</script>
 </body>
 </html>

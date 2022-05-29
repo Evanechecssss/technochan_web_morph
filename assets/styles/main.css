@@ -8,6 +8,9 @@ body, html {
     flex-direction: column;
     justify-content: center;
     overflow: visible;
+    font-family: 'Comfortaa', cursive;
+    font-family: 'Lexend', sans-serif;
+    font-family: 'Ubuntu', sans-serif;
 }
 
 a {
@@ -28,64 +31,10 @@ a {
         -ms-user-select: none; 
             user-select: none;
 }
-h1{
-    position: relative;
-    -webkit-box-direction: normal;
-    list-style: none;
-    word-wrap: break-word;
-    user-select: text;
-    font-weight: inherit;
-    font-style: inherit;
-    display: block;
-    color:white;
-    text-size-adjust: none;
-    forced-color-adjust: none;
-    font-size: 3rem;
-    text-indent: 0;
-    white-space: pre-wrap;
+
+#sliders{
+    position: absolute;
+    top: 0;
+    left: 600px;
+
 }
-
-.text_center {
-    text-align: center;
-}
-
-.container {
-    position: relative;
-    width: 100%;
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-.header {
-    position: relative;
-    text-rendering: optimizeLegibility;
-    -webkit-box-direction: normal;
-    list-style: none;
-    word-wrap: break-word;
-    user-select: text;
-    display: block;
-  
-}
-
-
-
-.main {
-    position: relative;
-    text-rendering: optimizeLegibility;
-    -webkit-box-direction: normal;
-    list-style: none;
-    word-wrap: break-word;
-    user-select: text;
-    display: block;
-}
-
-.footer {
- position: relative;
-    text-rendering: optimizeLegibility;
-    -webkit-box-direction: normal;
-    list-style: none;
-    word-wrap: break-word;
-    user-select: text;
-    display: block;
-}
-
