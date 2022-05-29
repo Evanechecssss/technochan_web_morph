@@ -21,26 +21,27 @@
 <body>
 <canvas id = "bodyCanvas"></canvas>
 <div id = "sliders" style="margin-left: 20px;">
-    <p style="text-align: center; margin: 0; color: white;">Сдвиг X</p>
+    <p>Сдвиг X</p>
     <input type="range" id = "x_shift" max="1" min="-1" step="0.01" onchange="headXShift('x_shift')">
-    <p style="text-align: center; margin: 0; color: white;">Сдвиг Y</p>
+    <p>Сдвиг Y</p>
     <input type="range" id = "y_shift" max="1" min="-1" step="0.01" onchange="headXShift('y_shift')">
 
-    <p style="text-align: center; margin: 0; color: white;">Длина головы</p>
+    <p>Длина головы</p>
     <input type="range" id = "head_height" max="1" min="0" step="0.01" value="0.62" onchange="headChange('head_height')">
-    <p style="text-align: center; margin: 0; color: white;">Ширина головы</p>
+    <p>Ширина головы</p>
     <input type="range" id = "head_width" max="1" min="0" step="0.01" value="0.47" onchange="headChange('head_width')">
+    <div id="btn">
+        <p id="symetric" style="color: white;">Симетрично</p>
+
+    </div>
+
 </div>
-<p id="symetric" style="color: white;">Симетрично</p>
 <script>
     const canvas = document.getElementById("bodyCanvas")
-    const symetric_toogle = document.getElementById("symetric")
+    const symetric_toogle = {btn: document.getElementById("btn"),txt: document.getElementById("symetric")}
     
     canvas.width = 600;
     canvas.height = 600;
-
-   /*var center_point_x = -0.08;
-     var center_point_y = -0.12;  */
 
     var center_point_x = 0;
     var center_point_y = 0; 
@@ -63,16 +64,17 @@
     {   
         animate()
     }
-    symetric_toogle.onclick = function()
+    symetric_toogle['btn'].onclick = function()
     {
         do_q_sym = !do_q_sym
         if (do_q_sym)
         {
-            symetric_toogle.style.color = 'red';
+            symetric_toogle['btn'].style.backgroundColor = 'white';
+            symetric_toogle['txt'].style.color = '#1a1919';
         }
         else{
-            symetric_toogle.style.color = 'white';
-
+            symetric_toogle['btn'].style.backgroundColor = '#1a1919';
+            symetric_toogle['txt'].style.color = 'white';
         }
     }
 
@@ -256,7 +258,6 @@
     function drawPoint(loc, label, rad = 0.07, line =  0.01, color = 'pink')
     {
         ctx.lineWidth = line;
-
         ctx.beginPath()
         ctx.arc(loc.x,loc.y,rad,0,Math.PI*2)
         ctx.stroke();
@@ -267,7 +268,6 @@
         ctx.textAlign = "center"
         ctx.textBaseline = "middle"
         ctx.fillText(label,loc.x,loc.y)
-
         ctx.lineWidth = lineWidth;
     }
 
