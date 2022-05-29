@@ -2,7 +2,7 @@
 <html lang="ru" dir="auto" prefix="og: http://ogp.me/ns#">
 <head>
     <meta charset="utf-8">
-    <title>Технотян</title>
+    <title>Technochan</title>
     <meta property="og:title" content="Technochan" />
     <meta property="og:type" content="article" />
     <meta property="og:url" content="https://evanechecssss.github.io/technochan_web_morph" />
@@ -20,25 +20,30 @@
 </head>
 <body>
 <canvas id = "bodyCanvas"></canvas>
-<div id = "sliders" style="margin-left: 20px;">
+<div id = "sliders" >
     <p>Shift X</p>
     <input type="range" id = "x_shift" max="1" min="-1" step="0.01" onchange="headShift('x_shift')">
     <p>Shift Y</p>
     <input type="range" id = "y_shift" max="1" min="-1" step="0.01" onchange="headShift('y_shift')">
-
     <p>Head height</p>
     <input type="range" id = "head_height" max="1" min="0" step="0.01" value="0.62" onchange="headChange('head_height')">
     <p>Head width</p>
     <input type="range" id = "head_width" max="1" min="0" step="0.01" value="0.47" onchange="headChange('head_width')">
-    <div id="btn">
+    <p>Eyes line</p>
+    <input type="range" id = "eysline" max="1" min="-1" step="0.01" onchange="editEyesLine()">
+    <p>Buttons</p>
+    <div id="btn_s" class="btn">
         <p id="symetric" style="color: white;">Symmetry</p>
-
     </div>
-
+    <div id="btn_e" class="btn">
+        <p id="edit_face" style="color: white;">Edit look</p>
+    </div>
 </div>
 <script>
     const canvas = document.getElementById("bodyCanvas")
-    const symetric_toogle = {btn: document.getElementById("btn"),txt: document.getElementById("symetric")}
+    const symetric_toogle = {btn: document.getElementById("btn_s"),txt: document.getElementById("symetric")}
+    const editface_toogle = {btn: document.getElementById("btn_e"),txt: document.getElementById("edit_face")}
+
     canvas.width = 600;
     canvas.height = 600;
 
@@ -50,6 +55,9 @@
     var head_width = 0.47;
     var click_zone = "undef";
     var do_q_sym = false;
+    var do_edit = true;
+    var look_edit = false;
+    var eysline_shift = 0;
     var ul_q_x = -0.43;
     var ul_q_y = -0.66;
     var ur_q_x = 0.35;
@@ -59,6 +67,8 @@
     var dr_q_x = 0.43;
     var dr_q_y = 0.35;
     var lineWidth = 0.01;
+    var lookPointX = center_point_x;
+    var lookPointY = center_point_y;
 
     const ctx = canvas.getContext("2d");
     ctx.translate(canvas.width/2, canvas.height/2)
@@ -74,6 +84,7 @@
     symetric_toogle['btn'].onclick = function()
     {
         do_q_sym = !do_q_sym
+        
         if (do_q_sym)
         {
             symetric_toogle['btn'].style.backgroundColor = 'white';
@@ -84,15 +95,46 @@
             symetric_toogle['txt'].style.color = 'white';
         }
     }
+    editface_toogle['btn'].onclick = function(){
+        look_edit = do_edit
+        do_edit = !do_edit
+        if (do_edit)
+        {
+            editface_toogle['btn'].style.backgroundColor = '#1a1919';
+            editface_toogle['txt'].style.color = 'white';
+            editface_toogle['txt'].textContent = 'Edit look';
 
+        }
+        else
+        {
+            editface_toogle['btn'].style.backgroundColor = 'white';
+            editface_toogle['txt'].style.color = '#1a1919';
+            editface_toogle['txt'].textContent = 'Edit face';
+
+        }
+    }
     canvas.addEventListener("click",clickEvent);
 
     function clickEvent(event)
     {
-        zone_locate(event)
-        setFace(event)
+        if (do_edit)
+        {
+            zone_locate(event)
+            setFace(event)
+        }
+        if (look_edit)
+        {
+            setLook(event)
+        }
     }
-
+    function setLook(event)
+    {
+        let clickCords = getCords(event)
+        click_point_x = clickCords['x']
+        click_point_y = clickCords['y']
+        lookPointX = click_point_x
+        lookPointY = click_point_y
+    }
     function zone_locate(event)
     {
         let clickCords = getCords(event)
@@ -209,52 +251,50 @@
         ctx.lineWidth = lineWidth;
         //#region drawCross
         ctx.beginPath();
-        ctx.moveTo(center_point_x,center_point_y);
-        ctx.lineTo(center_point_x,center_point_y-head_height);
+        ctx.moveTo(center_point_x,center_point_y-head_height);
+        ctx.quadraticCurveTo(lookPointX,lookPointY,center_point_x,center_point_y+head_height);
         ctx.stroke();
+
         ctx.beginPath();
-        ctx.moveTo(center_point_x,center_point_y);
-        ctx.lineTo(center_point_x,center_point_y+head_height);
+        ctx.moveTo(center_point_x-head_width,center_point_y+eysline_shift);
+        ctx.quadraticCurveTo(lookPointX,lookPointY,center_point_x+head_width,center_point_y+eysline_shift);
         ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(center_point_x,center_point_y);
-        ctx.lineTo(center_point_x-head_width,center_point_y);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(center_point_x,center_point_y);
-        ctx.lineTo(center_point_x+head_width,center_point_y);
-        ctx.stroke();
+  
         //#endregion
         //#region drawControlPoints
-        drawPoint({x:center_point_x,y:center_point_y},"center",0.025,0.005,"lime")
+        /* drawPoint({x:center_point_x,y:center_point_y},"center",0.025,0.005,"lime")
         drawPoint({x:center_point_x+head_width,y:center_point_y},"Right",0.025,0.005,"lime")
         drawPoint({x:center_point_x-head_width,y:center_point_y},"Left",0.025,0.005,"lime")
         drawPoint({x:center_point_x,y:center_point_y-head_height},"Up",0.025,0.005,"lime")
-        drawPoint({x:center_point_x,y:center_point_y+head_height},"Down",0.025,0.005,"lime")
-        drawPoint({x:ur_q_x,y:ur_q_y}," ",0.02,0.005)
-        drawPoint({x:ul_q_x,y:ul_q_y}," ",0.02,0.005)
-        drawPoint({x:dr_q_x,y:dr_q_y}," ",0.02,0.005)
-        drawPoint({x:dl_q_x,y:dl_q_y}," ",0.02,0.005)
+        drawPoint({x:center_point_x,y:center_point_y+head_height},"Down",0.025,0.005,"lime")*/
+        drawPoint({x:ur_q_x,y:ur_q_y}," ",0.015,0.005)
+        drawPoint({x:ul_q_x,y:ul_q_y}," ",0.015,0.005)
+        drawPoint({x:dr_q_x,y:dr_q_y}," ",0.015,0.005)
+        drawPoint({x:dl_q_x,y:dl_q_y}," ",0.015,0.005)
         //#endregion
         //#region drawFace
         ctx.beginPath();
         ctx.moveTo(center_point_x,center_point_y-head_height);
-        ctx.quadraticCurveTo(ul_q_x,ul_q_y,center_point_x-head_width,center_point_y);
+        ctx.quadraticCurveTo(ul_q_x,ul_q_y,center_point_x-head_width,center_point_y+eysline_shift);
         ctx.stroke();
         ctx.beginPath();
         ctx.moveTo(center_point_x,center_point_y-head_height);
-        ctx.quadraticCurveTo(ur_q_x,ur_q_y,center_point_x+head_width,center_point_y);
+        ctx.quadraticCurveTo(ur_q_x,ur_q_y,center_point_x+head_width,center_point_y+eysline_shift);
         ctx.stroke();
         ctx.beginPath();
         ctx.moveTo(center_point_x,center_point_y+head_height);
-        ctx.quadraticCurveTo(dr_q_x,dr_q_y,center_point_x+head_width,center_point_y);
+        ctx.quadraticCurveTo(dr_q_x,dr_q_y,center_point_x+head_width,center_point_y+eysline_shift);
         ctx.stroke();
         ctx.beginPath();
         ctx.moveTo(center_point_x,center_point_y+head_height);
-        ctx.quadraticCurveTo(dl_q_x,dl_q_y,center_point_x-head_width,center_point_y);
+        ctx.quadraticCurveTo(dl_q_x,dl_q_y,center_point_x-head_width,center_point_y+eysline_shift);
         ctx.stroke();
         //#endregion
 
+        //#region experement
+
+
+        //#endregion
 
         window.requestAnimationFrame(drawAvatar);
     }
@@ -282,6 +322,7 @@
        {
         deltha = center_point_x - Number(togle.value)
         center_point_x = Number(togle.value)
+        lookPointX = lookPointX - deltha
         ul_q_x = ul_q_x - deltha
         ur_q_x = ur_q_x - deltha
         dl_q_x = dl_q_x - deltha
@@ -291,11 +332,18 @@
        {
         deltha = center_point_y - Number(togle.value)
         center_point_y = Number(togle.value)
+        lookPointY = lookPointY - deltha
         ul_q_y = ul_q_y - deltha
         ur_q_y = ur_q_y - deltha
         dl_q_y = dl_q_y - deltha
         dr_q_y = dr_q_y - deltha
        }
+    }
+    
+    function editEyesLine()
+    {
+        togle = document.getElementById('eysline')
+        eysline_shift =  Number(togle.value)
     }
 
     function headChange(id)
