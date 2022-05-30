@@ -20,6 +20,8 @@
 </head>
 <body>
 <canvas id = "bodyCanvas"></canvas>
+<canvas id = "camCanvas"></canvas>
+
 <div id = "sliders" >
     <p>Shift X</p>
     <input type="range" id = "x_shift" max="1" min="-1" step="0.01" onchange="headShift('x_shift')">
@@ -39,6 +41,7 @@
         <p id="edit_face" style="color: white;">Edit look</p>
     </div>
 </div>
+<script src = "assets/scripts/camera.js"></script>   
 <script>
     const canvas = document.getElementById("bodyCanvas")
     const symetric_toogle = {btn: document.getElementById("btn_s"),txt: document.getElementById("symetric")}
@@ -71,6 +74,7 @@
     var lookPointY = center_point_y;
 
     const ctx = canvas.getContext("2d");
+    const ctx_cam = cam_canvas.getContext('2d')
     ctx.translate(canvas.width/2, canvas.height/2)
     ctx.scale(canvas.width*0.5,canvas.height*0.5)
     const img = new Image();
@@ -241,6 +245,25 @@
         ctx.drawImage(img,-1,-1,2,2);
         ctx.globalAlpha = 1;
         drawAvatar();
+        if (video!=null)
+        {
+            ctx_cam.save();
+            ctx_cam.scale(-1, 1);
+            ctx_cam.drawImage(video, 0, 0, cam_canvas.width * -1, cam_canvas.height);
+            ctx_cam.restore();
+            var imgData = ctx_cam.getImageData(0, 0, cam_canvas.width, cam_canvas.height);
+            var data = imgData.data;
+            for (var i = 0; i < data.length; i += 4) 
+            {
+                data[i] = data[i] + 100
+                data[i+1] = data[i+1];
+                data[i+2] = data[i+2];
+                data[i+3] = data[i+3];
+
+            }
+            ctx_cam.putImageData(imgData, 0, 0);
+        }
+
         requestAnimationFrame(animate)
     }
     
@@ -249,7 +272,7 @@
     function drawAvatar()
     {
         ctx.lineWidth = lineWidth;
-        //#region drawCross
+        
         ctx.beginPath();
         ctx.moveTo(center_point_x,center_point_y-head_height);
         ctx.quadraticCurveTo(lookPointX,lookPointY,center_point_x,center_point_y+head_height);
@@ -259,20 +282,18 @@
         ctx.moveTo(center_point_x-head_width,center_point_y+eysline_shift);
         ctx.quadraticCurveTo(lookPointX,lookPointY,center_point_x+head_width,center_point_y+eysline_shift);
         ctx.stroke();
-  
-        //#endregion
-        //#region drawControlPoints
-        /* drawPoint({x:center_point_x,y:center_point_y},"center",0.025,0.005,"lime")
+        /* 
+        drawPoint({x:center_point_x,y:center_point_y},"center",0.025,0.005,"lime")
         drawPoint({x:center_point_x+head_width,y:center_point_y},"Right",0.025,0.005,"lime")
         drawPoint({x:center_point_x-head_width,y:center_point_y},"Left",0.025,0.005,"lime")
         drawPoint({x:center_point_x,y:center_point_y-head_height},"Up",0.025,0.005,"lime")
-        drawPoint({x:center_point_x,y:center_point_y+head_height},"Down",0.025,0.005,"lime")*/
+        drawPoint({x:center_point_x,y:center_point_y+head_height},"Down",0.025,0.005,"lime")
+        */
         drawPoint({x:ur_q_x,y:ur_q_y}," ",0.015,0.005)
         drawPoint({x:ul_q_x,y:ul_q_y}," ",0.015,0.005)
         drawPoint({x:dr_q_x,y:dr_q_y}," ",0.015,0.005)
         drawPoint({x:dl_q_x,y:dl_q_y}," ",0.015,0.005)
-        //#endregion
-        //#region drawFace
+  
         ctx.beginPath();
         ctx.moveTo(center_point_x,center_point_y-head_height);
         ctx.quadraticCurveTo(ul_q_x,ul_q_y,center_point_x-head_width,center_point_y+eysline_shift);
@@ -289,12 +310,7 @@
         ctx.moveTo(center_point_x,center_point_y+head_height);
         ctx.quadraticCurveTo(dl_q_x,dl_q_y,center_point_x-head_width,center_point_y+eysline_shift);
         ctx.stroke();
-        //#endregion
-
-        //#region experement
-
-
-        //#endregion
+    
 
         window.requestAnimationFrame(drawAvatar);
     }
