@@ -2,3 +2,6 @@ canvas{
     border: 1px solid white; 
 
 }
+#camCanvas{
+    max-width: 600px;
+}

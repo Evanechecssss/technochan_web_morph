@@ -42,6 +42,8 @@
     </div>
 </div>
 <script src = "assets/scripts/camera.js"></script>   
+<script src = "assets/scripts/utiles.js"></script>   
+
 <script>
     const canvas = document.getElementById("bodyCanvas")
     const symetric_toogle = {btn: document.getElementById("btn_s"),txt: document.getElementById("symetric")}
@@ -99,6 +101,7 @@
             symetric_toogle['txt'].style.color = 'white';
         }
     }
+    
     editface_toogle['btn'].onclick = function(){
         look_edit = do_edit
         do_edit = !do_edit
@@ -117,6 +120,7 @@
 
         }
     }
+    
     canvas.addEventListener("click",clickEvent);
 
     function clickEvent(event)
@@ -131,6 +135,7 @@
             setLook(event)
         }
     }
+    
     function setLook(event)
     {
         let clickCords = getCords(event)
@@ -139,6 +144,7 @@
         lookPointX = click_point_x
         lookPointY = click_point_y
     }
+    
     function zone_locate(event)
     {
         let clickCords = getCords(event)
@@ -251,24 +257,24 @@
             ctx_cam.scale(-1, 1);
             ctx_cam.drawImage(video, 0, 0, cam_canvas.width * -1, cam_canvas.height);
             ctx_cam.restore();
-            var imgData = ctx_cam.getImageData(0, 0, cam_canvas.width, cam_canvas.height);
-            var data = imgData.data;
-            for (var i = 0; i < data.length; i += 4) 
+            const imgData = ctx_cam.getImageData(0,0, cam_canvas.width, cam_canvas.height);
+            const locs = getMarkedLocations(imgData);
+            if (locs.length>0)
             {
-                data[i] = data[i] + 100
-                data[i+1] = data[i+1];
-                data[i+2] = data[i+2];
-                data[i+3] = data[i+3];
-
+                const avg = average(locs);
+                const x = (avg.x-imgData.width/2)/imgData.width;
+                const y = (avg.y-imgData.height/2)/imgData.height;
+                updateLook(x, y);
             }
-            ctx_cam.putImageData(imgData, 0, 0);
         }
 
         requestAnimationFrame(animate)
     }
-    
-
-
+    function updateLook(x, y)
+    {
+        lookPointX = x;
+        lookPointY = y;
+    }
     function drawAvatar()
     {
         ctx.lineWidth = lineWidth;
@@ -313,22 +319,6 @@
     
 
         window.requestAnimationFrame(drawAvatar);
-    }
-
-    function drawPoint(loc, label, rad = 0.07, line =  0.01, color = 'pink')
-    {
-        ctx.lineWidth = line;
-        ctx.beginPath()
-        ctx.arc(loc.x,loc.y,rad,0,Math.PI*2)
-        ctx.stroke();
-        ctx.fillStyle = color
-        ctx.fill()
-        ctx.fillStyle = 'black'
-        ctx.font = (rad*2) + "px Arial"
-        ctx.textAlign = "center"
-        ctx.textBaseline = "middle"
-        ctx.fillText(label,loc.x,loc.y)
-        ctx.lineWidth = lineWidth;
     }
 
     function headShift(id)
