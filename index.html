@@ -75,12 +75,23 @@
     var lookPointX = center_point_x;
     var lookPointY = center_point_y;
 
+    const face_color = '#FFEFEF'
+
+
     const ctx = canvas.getContext("2d");
     const ctx_cam = cam_canvas.getContext('2d')
     ctx.translate(canvas.width/2, canvas.height/2)
     ctx.scale(canvas.width*0.5,canvas.height*0.5)
     const img = new Image();
     img.src = 'assets/imgs/reference.jpg';
+
+    const img_eyes = new Image();
+    img_eyes.src = 'assets/imgs/eyes.png';
+
+    img_eyes.onload = function()
+    {   
+        
+    }
 
     img.onload = function()
     {   
@@ -243,14 +254,32 @@
         return {x:x.toFixed(2),y:y.toFixed(2)}
 
     }
+    
+    function animate_img_eyes()
+    {
+        
+        /*
+        d = Math.sqrt( (lookPointX - center_point_x+head_width)**2 + (center_point_x)**2 )
+        d2 = Math.sqrt( (lookPointX - center_point_x-head_width)**2 + (center_point_x)**2 ) 
+        */
+        d = Math.sqrt( (lookPointX - center_point_x+head_width)**2 + (center_point_x)**2 )
+        d2 = Math.sqrt( (lookPointX - center_point_x-head_width)**2 + (center_point_x)**2 ) 
+        drawPoint({x:d/2,y:(center_point_y-lookPointY)/-2}," ",0.05,0.005)
+        drawPoint({x:-d2/2,y:(center_point_y-lookPointY)/-2}," ",0.05,0.005)
+
+       // ctx.drawImage(img_eyes,center_point_x-head_width+eyes_m,center_point_y,0.2,0.2);
+       // ctx.drawImage(img_eyes,center_point_x+head_width-eyes_m,center_point_y,0.2,0.2);
+    }
 
     function animate()
     {
         ctx.clearRect(-1,-1,2,2)
-        //ctx.globalAlpha = 0.2;
         ctx.drawImage(img,-1,-1,2,2);
         ctx.globalAlpha = 1;
+        //ctx.globalAlpha = 0.4;
         drawAvatar();
+        ctx.globalAlpha = 1;
+
         if (video!=null)
         {
             ctx_cam.save();
@@ -267,7 +296,7 @@
                 updateLook(x, y);
             }
         }
-
+        animate_img_eyes()
         requestAnimationFrame(animate)
     }
     function updateLook(x, y)
@@ -278,7 +307,20 @@
     function drawAvatar()
     {
         ctx.lineWidth = lineWidth;
-        
+        ctx.fillStyle = 'round'
+        ctx.beginPath();
+        ctx.moveTo(center_point_x,center_point_y-head_height);
+        ctx.quadraticCurveTo(ul_q_x,ul_q_y,center_point_x-head_width,center_point_y+eysline_shift);
+        ctx.quadraticCurveTo(dl_q_x,dl_q_y,center_point_x,center_point_y+eysline_shift+head_height);
+        ctx.quadraticCurveTo(dr_q_x,dr_q_y,center_point_x+head_width,center_point_y+eysline_shift);
+        ctx.quadraticCurveTo(ur_q_x,ur_q_y,center_point_x,center_point_y+eysline_shift-head_height);
+        ctx.stroke();
+        const img5 = new Image();
+        img5.src = 'assets/imgs/face.jpg';
+        var ptr = ctx.createPattern(img5,"repeat")
+        ctx.fillStyle = ptr
+        ctx.fill()
+
         ctx.beginPath();
         ctx.moveTo(center_point_x,center_point_y-head_height);
         ctx.quadraticCurveTo(lookPointX,lookPointY,center_point_x,center_point_y+head_height);
@@ -300,7 +342,8 @@
         drawPoint({x:dr_q_x,y:dr_q_y}," ",0.015,0.005)
         drawPoint({x:dl_q_x,y:dl_q_y}," ",0.015,0.005)
   
-        ctx.beginPath();
+ 
+        /*ctx.beginPath();
         ctx.moveTo(center_point_x,center_point_y-head_height);
         ctx.quadraticCurveTo(ul_q_x,ul_q_y,center_point_x-head_width,center_point_y+eysline_shift);
         ctx.stroke();
@@ -316,7 +359,7 @@
         ctx.moveTo(center_point_x,center_point_y+head_height);
         ctx.quadraticCurveTo(dl_q_x,dl_q_y,center_point_x-head_width,center_point_y+eysline_shift);
         ctx.stroke();
-    
+        */
 
         window.requestAnimationFrame(drawAvatar);
     }
