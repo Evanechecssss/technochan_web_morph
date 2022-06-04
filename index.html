@@ -71,12 +71,23 @@
     var dl_q_y = 0.35;
     var dr_q_x = 0.43;
     var dr_q_y = 0.35;
+    var eyesr1_q_x = 0.17;
+    var eyesr2_q_x = 0.16;
+    var eyesr1_q_y = -0.05;
+    var eyesr2_q_y = 0.15;
+    var mouth_q_x = 0.06
+    var mouth_q_y = 0.34
+    var eyesr1_q2_x = 0.17;
+    var eyesr2_q2_x = 0.16;
+    var eyesr1_q2_y = -0.05;
+    var eyesr2_q2_y = 0.15;
+
     var lineWidth = 0.01;
     var lookPointX = center_point_x;
     var lookPointY = center_point_y;
-
+    center_mouth_x_1 = 0
+    center_mouth_y_1= 0
     const face_color = '#FFEFEF'
-
 
     const ctx = canvas.getContext("2d");
     const ctx_cam = cam_canvas.getContext('2d')
@@ -84,14 +95,6 @@
     ctx.scale(canvas.width*0.5,canvas.height*0.5)
     const img = new Image();
     img.src = 'assets/imgs/reference.jpg';
-
-    const img_eyes = new Image();
-    img_eyes.src = 'assets/imgs/eyes.png';
-
-    img_eyes.onload = function()
-    {   
-        
-    }
 
     img.onload = function()
     {   
@@ -251,24 +254,68 @@
     {
         const x = (event.x-canvas.width/2)/(canvas.width/2)
         const y = (event.y-canvas.height/2)/(canvas.height/2)
+        console.log(x + " - " + y)
         return {x:x.toFixed(2),y:y.toFixed(2)}
-
     }
     
+    
+    function animate_mouth()
+    {
+        ctx.beginPath();
+        ctx.moveTo(center_mouth_x_1-0.07,center_mouth_y_1);
+        ctx.quadraticCurveTo(mouth_q_x,mouth_q_y,center_mouth_x_1+0.07,center_mouth_y_1);
+        ctx.stroke();
+
+    }
+
     function animate_img_eyes()
     {
-        
-        /*
-        d = Math.sqrt( (lookPointX - center_point_x+head_width)**2 + (center_point_x)**2 )
-        d2 = Math.sqrt( (lookPointX - center_point_x-head_width)**2 + (center_point_x)**2 ) 
-        */
-        d = Math.sqrt( (lookPointX - center_point_x+head_width)**2 + (center_point_x)**2 )
-        d2 = Math.sqrt( (lookPointX - center_point_x-head_width)**2 + (center_point_x)**2 ) 
-        drawPoint({x:d/2,y:(center_point_y-lookPointY)/-2}," ",0.05,0.005)
-        drawPoint({x:-d2/2,y:(center_point_y-lookPointY)/-2}," ",0.05,0.005)
 
-       // ctx.drawImage(img_eyes,center_point_x-head_width+eyes_m,center_point_y,0.2,0.2);
-       // ctx.drawImage(img_eyes,center_point_x+head_width-eyes_m,center_point_y,0.2,0.2);
+        center_eyes_x_1 = eyesr1_q_x
+        center_eyes_y_1 = (eyesr2_q_y + eyesr1_q_y)/2
+
+        ctx.beginPath();
+        ctx.moveTo(center_eyes_x_1-0.1,center_eyes_y_1);
+        ctx.quadraticCurveTo(eyesr1_q_x,eyesr1_q_y,center_eyes_x_1+0.1,center_eyes_y_1);
+        ctx.quadraticCurveTo(eyesr2_q_x,eyesr2_q_y,center_eyes_x_1-0.1,center_eyes_y_1);
+        ctx.stroke();
+        ctx.fillStyle = 'white'
+        ctx.fill()
+
+        ctx.beginPath()
+        ctx.arc(center_eyes_x_1,center_eyes_y_1,0.04,0,Math.PI*2)
+        ctx.stroke();
+        ctx.fillStyle = 'black'
+        ctx.fill()
+
+        ctx.beginPath()
+        ctx.arc(center_eyes_x_1,center_eyes_y_1,0.025,0,Math.PI*2)
+        ctx.stroke();
+        ctx.fillStyle = 'green'
+        ctx.fill()
+
+        center_eyes_x_2 = eyesr1_q2_x
+        center_eyes_y_2 = (eyesr2_q2_y + eyesr1_q2_y)/2
+
+        ctx.beginPath();
+        ctx.moveTo(center_eyes_x_2-0.1,center_eyes_y_2);
+        ctx.quadraticCurveTo(eyesr1_q2_x,eyesr1_q2_y,center_eyes_x_2+0.1,center_eyes_y_2);
+        ctx.quadraticCurveTo(eyesr2_q2_x,eyesr2_q2_y,center_eyes_x_2-0.1,center_eyes_y_2);
+        ctx.stroke();
+        ctx.fillStyle = 'white'
+        ctx.fill()
+
+        ctx.beginPath()
+        ctx.arc(center_eyes_x_2,center_eyes_y_2,0.04,0,Math.PI*2)
+        ctx.stroke();
+        ctx.fillStyle = 'black'
+        ctx.fill()
+
+        ctx.beginPath()
+        ctx.arc(center_eyes_x_2,center_eyes_y_2,0.025,0,Math.PI*2)
+        ctx.stroke();
+        ctx.fillStyle = 'green'
+        ctx.fill()
     }
 
     function animate()
@@ -279,7 +326,6 @@
         //ctx.globalAlpha = 0.4;
         drawAvatar();
         ctx.globalAlpha = 1;
-
         if (video!=null)
         {
             ctx_cam.save();
@@ -297,15 +343,49 @@
             }
         }
         animate_img_eyes()
+        animate_mouth()
+
         requestAnimationFrame(animate)
     }
+
     function updateLook(x, y)
     {
+        delthax = lookPointX - x
+        delthay = lookPointY - y
+
+        s = ((center_point_x*2) + lookPointX ) / 2
+        s1 = (s - center_point_x + head_width)/2
+        s2 = (s - center_point_x - head_width)/2
+
+        h = ((center_point_y*2) + lookPointY ) / 2
+        h1 = (h - center_point_y + head_height)/2
+        h2 = (h - center_point_y - head_height)/2
+
+
+        center_mouth_x_1 = ((center_point_x*2) + lookPointX )/ 2
+        center_mouth_y_1 = h1
+        mouth_q_x = ((center_point_x*2) + lookPointX ) / 2
+        mouth_q_y = mouth_q_y
+
+        eyesr1_q_x = s1 - delthax
+        eyesr2_q_x = s1 - delthax
+
+        eyesr1_q_y = eyesr1_q_y - delthay
+        eyesr2_q_y = eyesr2_q_y - delthay
+
+        eyesr1_q2_x = s2 - delthax
+        eyesr2_q2_x = s2 - delthax
+        eyesr1_q2_y = eyesr1_q_y - delthay
+        eyesr2_q2_y = eyesr2_q_y - delthay
+
         lookPointX = x;
         lookPointY = y;
     }
+
+
     function drawAvatar()
     {
+        
         ctx.lineWidth = lineWidth;
         ctx.fillStyle = 'round'
         ctx.beginPath();
@@ -321,6 +401,7 @@
         ctx.fillStyle = ptr
         ctx.fill()
 
+        ctx.globalAlpha = 0.3;
         ctx.beginPath();
         ctx.moveTo(center_point_x,center_point_y-head_height);
         ctx.quadraticCurveTo(lookPointX,lookPointY,center_point_x,center_point_y+head_height);
@@ -330,37 +411,12 @@
         ctx.moveTo(center_point_x-head_width,center_point_y+eysline_shift);
         ctx.quadraticCurveTo(lookPointX,lookPointY,center_point_x+head_width,center_point_y+eysline_shift);
         ctx.stroke();
-        /* 
-        drawPoint({x:center_point_x,y:center_point_y},"center",0.025,0.005,"lime")
-        drawPoint({x:center_point_x+head_width,y:center_point_y},"Right",0.025,0.005,"lime")
-        drawPoint({x:center_point_x-head_width,y:center_point_y},"Left",0.025,0.005,"lime")
-        drawPoint({x:center_point_x,y:center_point_y-head_height},"Up",0.025,0.005,"lime")
-        drawPoint({x:center_point_x,y:center_point_y+head_height},"Down",0.025,0.005,"lime")
-        */
-        drawPoint({x:ur_q_x,y:ur_q_y}," ",0.015,0.005)
+        ctx.globalAlpha = 1;
+
+       /* drawPoint({x:ur_q_x,y:ur_q_y}," ",0.015,0.005)
         drawPoint({x:ul_q_x,y:ul_q_y}," ",0.015,0.005)
         drawPoint({x:dr_q_x,y:dr_q_y}," ",0.015,0.005)
-        drawPoint({x:dl_q_x,y:dl_q_y}," ",0.015,0.005)
-  
- 
-        /*ctx.beginPath();
-        ctx.moveTo(center_point_x,center_point_y-head_height);
-        ctx.quadraticCurveTo(ul_q_x,ul_q_y,center_point_x-head_width,center_point_y+eysline_shift);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(center_point_x,center_point_y-head_height);
-        ctx.quadraticCurveTo(ur_q_x,ur_q_y,center_point_x+head_width,center_point_y+eysline_shift);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(center_point_x,center_point_y+head_height);
-        ctx.quadraticCurveTo(dr_q_x,dr_q_y,center_point_x+head_width,center_point_y+eysline_shift);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(center_point_x,center_point_y+head_height);
-        ctx.quadraticCurveTo(dl_q_x,dl_q_y,center_point_x-head_width,center_point_y+eysline_shift);
-        ctx.stroke();
-        */
-
+        drawPoint({x:dl_q_x,y:dl_q_y}," ",0.015,0.005)*/
         window.requestAnimationFrame(drawAvatar);
     }
 
@@ -372,6 +428,7 @@
         deltha = center_point_x - Number(togle.value)
         center_point_x = Number(togle.value)
         lookPointX = lookPointX - deltha
+
         ul_q_x = ul_q_x - deltha
         ur_q_x = ur_q_x - deltha
         dl_q_x = dl_q_x - deltha
@@ -382,6 +439,7 @@
         deltha = center_point_y - Number(togle.value)
         center_point_y = Number(togle.value)
         lookPointY = lookPointY - deltha
+
         ul_q_y = ul_q_y - deltha
         ur_q_y = ur_q_y - deltha
         dl_q_y = dl_q_y - deltha
